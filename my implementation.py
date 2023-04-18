@@ -88,12 +88,15 @@ def value_iteration():
                         if utility > max_utility:
                             max_utility = utility
                 U_new[i, j] = max_utility
-        print("Iteration: ", k + 1)
-        k += 1
-        print(U_new)
+        # print("Iteration: ", k + 1)
+        # k += 1
+        # print(U_new)
         if np.max(np.abs(U_new - U)) < CONVERGENCE_THRESHOLD:
             break
         U = U_new
+        print("Iteration: ", k + 1)
+        k += 1
+        print(U)
     return U
 
 def optimal_policy(U):
@@ -118,6 +121,6 @@ def optimal_policy(U):
 
 if __name__ == '__main__':
     U = value_iteration()
-    # print(U)
+    print(U)
     policy = optimal_policy(U)
     print(policy)
