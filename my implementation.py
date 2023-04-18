@@ -71,6 +71,7 @@ def reward(state):
 def value_iteration():
     # write your code here
     U = np.zeros((4, 3))
+    k = 0
     while True:
         U_new = np.zeros((4, 3))
         for i in range(4):
@@ -87,6 +88,8 @@ def value_iteration():
                         if utility > max_utility:
                             max_utility = utility
                 U_new[i, j] = max_utility
+        print("Iteration: ", k + 1)
+        k += 1
         print(U_new)
         if np.max(np.abs(U_new - U)) < CONVERGENCE_THRESHOLD:
             break
