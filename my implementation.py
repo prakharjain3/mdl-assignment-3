@@ -37,12 +37,20 @@ CONVERGENCE_THRESHOLD = 0.0001
 # write the transition function here
 def transition(state, action):
     if action == 'UP':
+        if state[0] == 0:
+            return state
         return (state[0] - 1, state[1])
     elif action == 'DOWN':
+        if state[0] == 3:
+            return state
         return (state[0] + 1, state[1])
     elif action == 'LEFT':
+        if state[1] == 0:
+            return state
         return (state[0], state[1] - 1)
     elif action == 'RIGHT':
+        if state[1] == 2:
+            return state
         return (state[0], state[1] + 1)
     
 def isValidAction(state, action):
@@ -64,7 +72,19 @@ def reward(state):
     else:
         return STEP_COST
 
-
+def calculate_utility(state, action, U):
+    utility = 0
+    utility += PROB_ACTION * (reward(transition(state, action)) + DISCOUNT_FACTOR * U[transition(state, action)])
+    perp_action = []
+    if action == 'UP' or action == 'DOWN':
+        perp_action.append('LEFT')
+        perp_action.append('RIGHT')
+    if action == 'LEFT' or action == 'RIGHT':
+        perp_action.append('UP')
+        perp_action.append('DOWN')
+    for paction in perp_action:
+        utility += PROB_PERPENDICULAR_ACTION * (reward(transition(state, paction)) + DISCOUNT_FACTOR * U[transition(state, paction)])
+    return utility
 
 
 
@@ -81,10 +101,7 @@ def value_iteration():
                 max_utility = -float('inf')
                 for action in ACTIONS:
                     if isValidAction((i, j), action):
-                        utility = 0
-                        utility += PROB_ACTION * (reward(transition((i, j), action)) + DISCOUNT_FACTOR * U[transition((i, j), action)])
-                        utility += PROB_PERPENDICULAR_ACTION * (reward(transition((i, j), action)) + DISCOUNT_FACTOR * U[transition((i, j), action)])
-                        utility += PROB_PERPENDICULAR_ACTION * (reward(transition((i, j), action)) + DISCOUNT_FACTOR * U[transition((i, j), action)])
+                        utility = calculate_utility((i, j), action, U)
                         if utility > max_utility:
                             max_utility = utility
                 U_new[i, j] = max_utility
@@ -101,6 +118,7 @@ def value_iteration():
 
 def optimal_policy(U):
     # write your code here
+    # policy = np.zeros((4, 3), dtype = object) # to print the whole string ('UP') instead of just the first letter ('U')
     policy = np.zeros((4, 3), dtype = str)
     for i in range(4):
         for j in range(3):
@@ -109,10 +127,7 @@ def optimal_policy(U):
             max_utility = -float('inf')
             for action in ACTIONS:
                 if isValidAction((i, j), action):
-                    utility = 0
-                    utility += PROB_ACTION * (reward(transition((i, j), action)) + DISCOUNT_FACTOR * U[transition((i, j), action)])
-                    utility += PROB_PERPENDICULAR_ACTION * (reward(transition((i, j), action)) + DISCOUNT_FACTOR * U[transition((i, j), action)])
-                    utility += PROB_PERPENDICULAR_ACTION * (reward(transition((i, j), action)) + DISCOUNT_FACTOR * U[transition((i, j), action)])
+                    utility = calculate_utility((i, j), action, U)
                     if utility > max_utility:
                         max_utility = utility
                         policy[i, j] = action
