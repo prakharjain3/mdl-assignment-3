@@ -90,12 +90,13 @@ def value_iteration(U):
                 nextU[r][c] = max(utility)
                 delta = max(delta, abs(U[r][c] - nextU[r][c]))
         U = nextU
-        if delta < DELTA:
-            break
         print("Iteration: ", i+1)
         i += 1
         STR_U = [[str(U[r][c]) for c in range(NUM_COLS)] for r in range(NUM_ROWS)]
+        STR_U[GOAL_STATE[0]][GOAL_STATE[1]] = "+1"
         print_list_of_list(STR_U)
+        if delta < DELTA:
+            break
     return U
 
 def get_policy(U):
@@ -123,6 +124,7 @@ U = value_iteration(U)
 
 print("Utility:")
 STR_U = [[str(U[r][c]) for c in range(NUM_COLS)] for r in range(NUM_ROWS)]
+STR_U[GOAL_STATE[0]][GOAL_STATE[1]] = "+1"
 print_list_of_list(STR_U)
 
 # Print the policy
