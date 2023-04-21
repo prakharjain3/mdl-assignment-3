@@ -94,10 +94,43 @@ def value_iteration(U):
             break
         print("Iteration: ", i+1)
         i += 1
-        for row in U:
-            print(row)
+        STR_U = [[str(U[r][c]) for c in range(NUM_COLS)] for r in range(NUM_ROWS)]
+        print_list_of_list(STR_U)
     return U
 
+def get_policy(U):
+    policy = [[0 for i in range(NUM_COLS)] for j in range(NUM_ROWS)]
+    for r in range(NUM_ROWS):
+        for c in range(NUM_COLS):
+            if (r, c) == RED_STATE or (r, c) == WALL_STATE or (r, c) == GOAL_STATE:
+                continue
+            utility = {}
+            for action in get_valid_actions(r, c):
+                utility[action] = get_value_state(U, r, c, action) # dicitionary
+            policy[r][c] = max(utility, key=utility.get)
+    return policy
+
+def print_list_of_list(list_of_list):
+    n = max(len(x) for l in list_of_list for x in l)
+
+    for row in list_of_list:
+        print('|', end=' ')
+        for x in row:
+            print(" "+''.join(x.ljust(n + 2) + '|'), end='')
+        print("\n")
+
 U = value_iteration(U)
-for row in U:
-    print(row)
+
+print("Utility:")
+STR_U = [[str(U[r][c]) for c in range(NUM_COLS)] for r in range(NUM_ROWS)]
+print_list_of_list(STR_U)
+
+# Print the policy
+policy = get_policy(U)
+print("Policy:")
+
+policy[GOAL_STATE[0]][GOAL_STATE[1]] = "+1"
+policy[RED_STATE[0]][RED_STATE[1]] = "-1"
+policy[WALL_STATE[0]][WALL_STATE[1]] = "Wall"
+
+print_list_of_list(policy)
