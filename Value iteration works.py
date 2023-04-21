@@ -77,7 +77,7 @@ def value_iteration(U):
     while True:
         nextU =[[0, 1, -1],
                 [0 for i in range(3)],
-                [0, None, 0],
+                [0, "WALL", 0],
                 [0 for i in range(3)]]
         delta = 0
         for r in range(NUM_ROWS):
@@ -90,7 +90,7 @@ def value_iteration(U):
                 nextU[r][c] = max(utility)
                 delta = max(delta, abs(U[r][c] - nextU[r][c]))
         U = nextU
-        print("Iteration: ", i+1)
+        print("Iteration: ", i+1, end='\n\n')
         i += 1
         STR_U = [[str(U[r][c]) for c in range(NUM_COLS)] for r in range(NUM_ROWS)]
         STR_U[GOAL_STATE[0]][GOAL_STATE[1]] = "+1"
@@ -117,22 +117,31 @@ def print_list_of_list(list_of_list):
     for row in list_of_list:
         print('|', end=' ')
         for x in row:
+            if x == "+1":
+                print(" \u001b[32m"+''.join(x.ljust(n + 2) + "\u001b[0m" + '|'), end='')
+                continue
+            elif x == "-1":
+                print(" \u001b[31m"+''.join(x.ljust(n + 2) + "\u001b[0m" + '|'), end='')
+                continue
+            elif x == "WALL":
+                print(" \u001b[38;5;240m"+''.join(x.ljust(n + 2) + "\u001b[0m" + '|'), end='')
+                continue
             print(" "+''.join(x.ljust(n + 2) + '|'), end='')
         print("\n")
 
 U = value_iteration(U)
 
-print("Utility:")
+print("Utility:", end='\n\n')
 STR_U = [[str(U[r][c]) for c in range(NUM_COLS)] for r in range(NUM_ROWS)]
 STR_U[GOAL_STATE[0]][GOAL_STATE[1]] = "+1"
 print_list_of_list(STR_U)
 
 # Print the policy
 policy = get_policy(U)
-print("Policy:")
+print("Policy:", end='\n\n')
 
 policy[GOAL_STATE[0]][GOAL_STATE[1]] = "+1"
 policy[RED_STATE[0]][RED_STATE[1]] = "-1"
-policy[WALL_STATE[0]][WALL_STATE[1]] = "Wall"
+policy[WALL_STATE[0]][WALL_STATE[1]] = "WALL"
 
 print_list_of_list(policy)
