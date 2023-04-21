@@ -1,4 +1,30 @@
-import pprint
+'''
+World
+
+|       |    + 1     |     - 1    |
+|       |            |            |
+|       |            |            |
+|       |    wall    |            |
+| start |            |            |
+'''
+
+"""
+1. Write a code in Python implementing Value iteration for a grid world given in the
+image above
+Values you will require:
+1. The reward for reaching the goal state = 1
+2. The penalty for reaching the red state = -1
+3. Step cost = -0.04
+4. Probability of going in the direction of the action = 0.7
+5. Probability of going in a direction perpendicular to the action = 0.15
+6. Discount Factor = 0.95
+Print the utility value of each cell in the grid after each iteration until the values
+converge. (Assume the values converge when the difference between the utilities
+for each cell is <= 0.0001)
+Note: The agent does not change its state if it hits a wall or the boundaries
+"""
+
+# DEFINING THE MDP
 
 GOAL_STATE = (0, 1)
 RED_STATE = (0, 2)
@@ -12,13 +38,15 @@ PROB_OTHER_ACTION = 0.15
 
 U = [[0, 1, -1],
      [0 for i in range(3)],
-     [0, None, 0],
+     [0, "WALL", 0],
      [0 for i in range(3)]]
 
 NUM_ROWS = len(U)
 NUM_COLS = len(U[0])
 
 ACTIONS = ["DOWN", "LEFT", "UP", "RIGHT"] # Down, Left, Up, Right
+
+# HELPER FUNCTIONS
 
 def get_valid_actions(r, c):
     valid_actions = []
@@ -72,6 +100,8 @@ def get_value_state(U, r, c, action):
         value_state += PROB_OTHER_ACTION * (STEP_COST + GAMMA * U[other_state[0]][other_state[1]])
     return value_state
 
+# MAIN FUNCTIONS
+
 def value_iteration(U):
     i = 0
     while True:
@@ -99,6 +129,7 @@ def value_iteration(U):
             break
     return U
 
+# find the optimal policy
 def get_policy(U):
     policy = [[0 for i in range(NUM_COLS)] for j in range(NUM_ROWS)]
     for r in range(NUM_ROWS):
@@ -111,37 +142,40 @@ def get_policy(U):
             policy[r][c] = max(utility, key=utility.get)
     return policy
 
+# PRINTING FUNCTION
 def print_list_of_list(list_of_list):
     n = max(len(x) for l in list_of_list for x in l)
 
     for row in list_of_list:
         print('|', end=' ')
         for x in row:
-            if x == "+1":
-                print(" \u001b[32m"+''.join(x.ljust(n + 2) + "\u001b[0m" + '|'), end='')
-                continue
-            elif x == "-1":
-                print(" \u001b[31m"+''.join(x.ljust(n + 2) + "\u001b[0m" + '|'), end='')
-                continue
-            elif x == "WALL":
-                print(" \u001b[38;5;240m"+''.join(x.ljust(n + 2) + "\u001b[0m" + '|'), end='')
-                continue
+            # if x == "+1":
+            #     print(" \u001b[32m"+''.join(x.ljust(n + 2) + "\u001b[0m" + '|'), end='')
+            #     continue
+            # elif x == "-1":
+            #     print(" \u001b[31m"+''.join(x.ljust(n + 2) + "\u001b[0m" + '|'), end='')
+            #     continue
+            # elif x == "WALL":
+            #     print(" \u001b[38;5;240m"+''.join(x.ljust(n + 2) + "\u001b[0m" + '|'), end='')
+            #     continue
             print(" "+''.join(x.ljust(n + 2) + '|'), end='')
         print("\n")
+    
+if __name__ == "__main__":
 
-U = value_iteration(U)
+    U = value_iteration(U)
 
-print("Utility:", end='\n\n')
-STR_U = [[str(U[r][c]) for c in range(NUM_COLS)] for r in range(NUM_ROWS)]
-STR_U[GOAL_STATE[0]][GOAL_STATE[1]] = "+1"
-print_list_of_list(STR_U)
+    print("Utility:", end='\n\n')
+    STR_U = [[str(U[r][c]) for c in range(NUM_COLS)] for r in range(NUM_ROWS)]
+    STR_U[GOAL_STATE[0]][GOAL_STATE[1]] = "+1"
+    print_list_of_list(STR_U)
 
-# Print the policy
-policy = get_policy(U)
-print("Policy:", end='\n\n')
+    # Print the policy
+    policy = get_policy(U)
+    print("Policy:", end='\n\n')
 
-policy[GOAL_STATE[0]][GOAL_STATE[1]] = "+1"
-policy[RED_STATE[0]][RED_STATE[1]] = "-1"
-policy[WALL_STATE[0]][WALL_STATE[1]] = "WALL"
+    policy[GOAL_STATE[0]][GOAL_STATE[1]] = "+1"
+    policy[RED_STATE[0]][RED_STATE[1]] = "-1"
+    policy[WALL_STATE[0]][WALL_STATE[1]] = "WALL"
 
-print_list_of_list(policy)
+    print_list_of_list(policy)
