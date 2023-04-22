@@ -1,3 +1,4 @@
+
 '''
 World
 
@@ -48,18 +49,6 @@ ACTIONS = ["DOWN", "LEFT", "UP", "RIGHT"] # Down, Left, Up, Right
 
 # HELPER FUNCTIONS
 
-def get_valid_actions(r, c):
-    valid_actions = []
-    if r > 0:
-        valid_actions.append("UP")
-    if r < len(U) - 1:
-        valid_actions.append("DOWN")
-    if c > 0:
-        valid_actions.append("LEFT")
-    if c < len(U[0]) - 1:
-        valid_actions.append("RIGHT")
-    return valid_actions
-
 def get_state_corresponding_to_the_action(r, c, action):
     if action == "UP":
         if r == 0 or (r - 1, c) == WALL_STATE:
@@ -94,10 +83,11 @@ def get_value_state(U, r, c, action):
     value_state = 0
 
     x, y = get_state_corresponding_to_the_action(r, c, action)
-    value_state += PROB_ACTION * (STEP_COST + GAMMA * U[x][y])
+    value_state += PROB_ACTION * (GAMMA * U[x][y])
 
     for other_state in get_possible_other_states(r, c, action):
-        value_state += PROB_OTHER_ACTION * (STEP_COST + GAMMA * U[other_state[0]][other_state[1]])
+        value_state += PROB_OTHER_ACTION * ( GAMMA * U[other_state[0]][other_state[1]])
+    value_state += STEP_COST
     return value_state
 
 # MAIN FUNCTIONS
@@ -115,7 +105,7 @@ def value_iteration(U):
                 if (r, c) == RED_STATE or (r, c) == WALL_STATE or (r, c) == GOAL_STATE:
                     continue
                 utility = []
-                for action in get_valid_actions(r, c):
+                for action in ACTIONS:
                     utility.append(get_value_state(U, r, c, action))
                 nextU[r][c] = max(utility)
                 delta = max(delta, abs(U[r][c] - nextU[r][c]))
@@ -137,7 +127,7 @@ def get_policy(U):
             if (r, c) == RED_STATE or (r, c) == WALL_STATE or (r, c) == GOAL_STATE:
                 continue
             utility = {}
-            for action in get_valid_actions(r, c):
+            for action in ACTIONS:
                 utility[action] = get_value_state(U, r, c, action) # dicitionary
             policy[r][c] = max(utility, key=utility.get)
     return policy
@@ -149,15 +139,6 @@ def print_list_of_list(list_of_list):
     for row in list_of_list:
         print('|', end=' ')
         for x in row:
-            # if x == "+1":
-            #     print(" \u001b[32m"+''.join(x.ljust(n + 2) + "\u001b[0m" + '|'), end='')
-            #     continue
-            # elif x == "-1":
-            #     print(" \u001b[31m"+''.join(x.ljust(n + 2) + "\u001b[0m" + '|'), end='')
-            #     continue
-            # elif x == "WALL":
-            #     print(" \u001b[38;5;240m"+''.join(x.ljust(n + 2) + "\u001b[0m" + '|'), end='')
-            #     continue
             print(" "+''.join(x.ljust(n + 2) + '|'), end='')
         print("\n")
     
